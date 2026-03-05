@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LS4YOU – On passe à la scène</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red:    #C62828;
+    --yellow: #FFD54F;
+    --turq:   #00ACC1;
+    --mint:   #66BB6A;
+    --orange: #FB8C00;
+    --violet: #7E57C2;
+    --black:  #1A1A1A;
+    --white:  #FFFDF7;
+    --shadow: 4px 4px 0px var(--black);
+    --shadow-lg: 6px 6px 0px var(--black);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Montserrat',sans-serif; background:var(--white); color:var(--black); min-height:100vh; }
+
+  /* ── PROGRESS BAR ── */
+  .progress-bar-wrapper { background:#fff; border-bottom:3px solid var(--black); padding:10px 20px; position:sticky; top:0; z-index:100; display:flex; align-items:center; gap:14px; }
+  .progress-steps { display:flex; gap:6px; flex:1; }
+  .step-dot { flex:1; height:8px; border-radius:4px; border:1.5px solid var(--black); background:#e0e0e0; transition:background 0.3s; }
+  .step-dot.active { background:var(--violet); }
+  .progress-label { font-family:'Poppins',sans-serif; font-size:0.72rem; font-weight:700; color:var(--black); white-space:nowrap; }
+
+  /* ── PARCOURS BANNER ── */
+  .parcours-banner {
+    background:var(--black);
+    padding:10px 24px;
+    display:flex;
+    align-items:center;
+    gap:0;
+    max-width:100%;
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+  .parcours-banner::-webkit-scrollbar { display:none; }
+  .parc-step {
+    display:flex; align-items:center; gap:10px;
+    padding:7px 16px 7px 12px;
+    font-family:'Poppins',sans-serif;
+    font-size:0.68rem;
+    font-weight:700;
+    color:rgba(255,255,255,0.45);
+    white-space:nowrap;
+    cursor:default;
+  }
+  .parc-step .pnum {
+    background:rgba(255,255,255,0.12);
+    width:20px; height:20px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:0.65rem;
+    flex-shrink:0;
+  }
+  .parc-step.done { color:rgba(255,255,255,0.65); }
+  .parc-step.done .pnum { background:var(--mint); color:#fff; }
+  .parc-step.current { color:var(--yellow); }
+  .parc-step.current .pnum { background:var(--yellow); color:var(--black); }
+  .parc-arrow { color:rgba(255,255,255,0.25); font-size:0.7rem; flex-shrink:0; }
+
+  /* ── HEADER ── */
+  .header { background:var(--violet); padding:0; position:relative; overflow:hidden; }
+  .header-inner { max-width:960px; margin:0 auto; padding:32px 24px 28px; display:flex; align-items:center; gap:20px; }
+  .header-badge { background:var(--yellow); border:3px solid var(--black); box-shadow:var(--shadow); border-radius:50%; width:64px; height:64px; display:flex; align-items:center; justify-content:center; font-size:28px; flex-shrink:0; }
+  .header-text h1 { font-family:'Poppins',sans-serif; font-size:2rem; font-weight:900; color:#fff; line-height:1.1; letter-spacing:-0.5px; }
+  .header-text h1 span { color:var(--yellow); }
+  .header-meta { display:flex; gap:10px; margin-top:8px; flex-wrap:wrap; }
+  .tag { background:rgba(255,255,255,0.18); border:2px solid rgba(255,255,255,0.5); border-radius:20px; padding:4px 12px; font-size:0.75rem; font-weight:600; color:#fff; letter-spacing:0.3px; }
+  .tag.solid { background:var(--yellow); color:var(--black); border-color:var(--black); box-shadow:2px 2px 0 var(--black); }
+  .tag.dark { background:rgba(0,0,0,0.25); border-color:rgba(255,255,255,0.3); }
+  .header-deco { position:absolute; right:-10px; top:-20px; font-size:140px; opacity:0.07; pointer-events:none; transform:rotate(15deg); }
+
+  /* ── MAIN ── */
+  .main { max-width:960px; margin:0 auto; padding:28px 20px 60px; }
+
+  /* ── INTRO CARD ── */
+  .intro-card { background:#EDE7F6; border:3px solid var(--black); box-shadow:var(--shadow-lg); border-radius:16px; padding:22px 28px; margin-bottom:32px; display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media(max-width:640px){ .intro-card { grid-template-columns:1fr; } }
+  .intro-card h2 { font-family:'Poppins',sans-serif; font-size:0.95rem; font-weight:800; color:var(--violet); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+  .intro-card p { font-size:0.84rem; line-height:1.6; color:#333; }
+  .meta-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
+  .meta-pill { background:var(--white); border:2px solid var(--black); border-radius:8px; padding:5px 12px; font-size:0.78rem; font-weight:700; display:flex; align-items:center; gap:6px; box-shadow:2px 2px 0 var(--black); }
+  .meta-pill.violet { background:#EDE7F6; }
+  .meta-pill.yellow { background:#FFFDE7; }
+  .meta-pill.turq   { background:#E0F7FA; }
+  .meta-pill.mint   { background:#F1F8E9; }
+
+  /* ── PHASE WRAPPER ── */
+  .phase { background:#fff; border:3px solid var(--black); box-shadow:var(--shadow-lg); border-radius:16px; overflow:hidden; margin-bottom:28px; }
+  .phase-header { padding:16px 24px; display:flex; align-items:center; gap:14px; border-bottom:3px solid var(--black); }
+  .phase-header.violet { background:var(--violet); color:#fff; }
+  .phase-header.yellow { background:var(--yellow); color:var(--black); }
+  .phase-header.turq   { background:var(--turq);   color:#fff; }
+  .phase-header.mint   { background:var(--mint);   color:#fff; }
+  .phase-header.orange { background:var(--orange); color:#fff; }
+  .phase-header.red    { background:var(--red);    color:#fff; }
+  .phase-header.black  { background:var(--black);  color:var(--yellow); }
+  .phase-icon { font-size:1.8rem; flex-shrink:0; }
+  .phase-title { flex:1; }
+  .phase-title h3 { font-family:'Poppins',sans-serif; font-weight:800; font-size:1rem; line-height:1.2; }
+  .phase-title small { font-size:0.75rem; opacity:0.85; font-weight:600; }
+  .phase-duration { background:rgba(0,0,0,0.15); border-radius:20px; padding:4px 12px; font-size:0.75rem; font-weight:700; white-space:nowrap; }
+  .phase-body { padding:22px 24px; }
+
+  /* ── TIP BOX ── */
+  .tip-box { border:2px solid var(--black); border-radius:12px; overflow:hidden; box-shadow:var(--shadow); margin-top:18px; }
+  .tip-box-header { background:var(--black); color:var(--yellow); padding:9px 16px; font-family:'Poppins',sans-serif; font-weight:700; font-size:0.8rem; display:flex; align-items:center; gap:8px; }
+  .tip-box-body { padding:14px 16px; background:#FFFDE7; font-size:0.79rem; line-height:1.6; color:#333; }
+  .tip-box-body ul { list-style:none; padding:0; display:flex; flex-direction:column; gap:5px; }
+  .tip-box-body ul li { display:flex; align-items:flex-start; gap:6px; }
+  .tip-box.violet .tip-box-header { background:var(--violet); }
+  .tip-box.violet .tip-box-body { background:#EDE7F6; }
+
+  /* ── CARDS GRID ── */
+  .cards-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px; margin-top:14px; }
+  .card { border:2px solid var(--black); border-radius:12px; padding:14px 16px; box-shadow:3px 3px 0 var(--black); transition:transform 0.15s,box-shadow 0.15s; }
+  .card:hover { transform:translateY(-2px); box-shadow:5px 5px 0 var(--black); }
+  .card.violet { background:#EDE7F6; }
+  .card.yellow { background:#FFFDE7; }
+  .card.turq   { background:#E0F7FA; }
+  .card.mint   { background:#F1F8E9; }
+  .card.orange { background:#FFF3E0; }
+  .card.red    { background:#FFEBEE; }
+  .card-icon { font-size:1.5rem; margin-bottom:6px; }
+  .card h4 { font-family:'Poppins',sans-serif; font-size:0.82rem; font-weight:700; margin-bottom:4px; }
+  .card p { font-size:0.75rem; line-height:1.4; color:#444; }
+
+  /* ── ROLE CARDS ── */
+  .roles-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px; margin-top:16px; }
+  .role-card { border:3px solid var(--black); border-radius:14px; overflow:hidden; box-shadow:var(--shadow); cursor:pointer; transition:transform 0.15s, box-shadow 0.15s; }
+  .role-card:hover { transform:translateY(-3px); box-shadow:6px 6px 0 var(--black); }
+  .role-card.claimed { outline:4px solid var(--mint); }
+  .role-header { padding:12px 16px; border-bottom:2px solid var(--black); display:flex; align-items:center; gap:10px; }
+  .role-icon { font-size:1.6rem; }
+  .role-title { font-family:'Poppins',sans-serif; font-weight:800; font-size:0.88rem; }
+  .role-body { padding:12px 16px; background:#fff; font-size:0.78rem; line-height:1.5; }
+  .role-body ul { list-style:none; padding:0; display:flex; flex-direction:column; gap:4px; }
+  .role-body ul li::before { content:'→ '; font-weight:700; }
+  .role-body ul li { color:#333; }
+  .role-claim { width:100%; padding:8px 12px; border:none; border-top:2px solid var(--black); font-family:'Poppins',sans-serif; font-weight:700; font-size:0.75rem; cursor:pointer; transition:background 0.15s; text-align:center; }
+
+  /* ── SUPPORT BUILDER ── */
+  .support-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px; }
+  @media(max-width:560px){ .support-grid { grid-template-columns:1fr; } }
+  .support-card { border:2px solid var(--black); border-radius:12px; overflow:hidden; box-shadow:var(--shadow); }
+  .support-card-header { padding:10px 14px; font-family:'Poppins',sans-serif; font-weight:800; font-size:0.82rem; border-bottom:2px solid var(--black); display:flex; align-items:center; gap:8px; }
+  .support-card-body { padding:12px 14px; background:#fff; }
+  .support-toggle { display:flex; gap:8px; margin-bottom:10px; }
+  .stoggle-btn { flex:1; padding:7px 4px; border:2px solid var(--black); border-radius:6px; font-family:'Poppins',sans-serif; font-weight:700; font-size:0.7rem; cursor:pointer; background:#fff; box-shadow:2px 2px 0 var(--black); transition:all 0.12s; text-align:center; }
+  .stoggle-btn.on { background:var(--violet); color:#fff; }
+  .support-detail { font-size:0.78rem; line-height:1.5; color:#444; border-top:1px dashed #ccc; padding-top:8px; display:none; }
+  .support-detail.visible { display:block; }
+  .support-detail ul { list-style:none; padding:0; }
+  .support-detail ul li { padding:2px 0; display:flex; align-items:flex-start; gap:5px; }
+
+  /* ── SCENARIO / QUIZ ── */
+  .scenario-block { border:2px solid var(--black); border-radius:12px; overflow:hidden; box-shadow:var(--shadow); margin-bottom:14px; }
+  .scenario-header { background:var(--black); color:var(--yellow); padding:10px 16px; font-family:'Poppins',sans-serif; font-weight:700; font-size:0.82rem; display:flex; align-items:center; gap:8px; }
+  .scenario-body { padding:14px 16px; background:#FFFDE7; }
+  .scenario-situation { font-size:0.83rem; font-weight:600; margin-bottom:10px; line-height:1.5; }
+  .scenario-choices { display:flex; flex-direction:column; gap:7px; }
+  .choice { display:flex; align-items:flex-start; gap:8px; padding:8px 12px; border:2px solid var(--black); border-radius:8px; background:#fff; cursor:pointer; font-size:0.78rem; font-weight:500; transition:all 0.15s; box-shadow:2px 2px 0 var(--black); }
+  .choice:hover { transform:translateX(3px); }
+  .choice-letter { font-family:'Poppins',sans-serif; font-weight:800; font-size:0.85rem; min-width:22px; height:22px; display:flex; align-items:center; justify-content:center; background:var(--black); color:var(--yellow); border-radius:4px; flex-shrink:0; }
+  .choice-feedback { display:none; margin-top:8px; padding:8px 12px; border-radius:8px; font-size:0.78rem; font-weight:600; border:1.5px solid var(--black); }
+  .choice-feedback.good { background:#E8F5E9; display:block; }
+  .choice-feedback.bad  { background:#FFEBEE; display:block; }
+
+  /* ── RÉPÉTITION GRILLE ── */
+  .repet-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:3px; border:3px solid var(--black); border-radius:12px; overflow:hidden; box-shadow:var(--shadow); margin-top:14px; }
+  .repet-col-header { padding:9px 12px; font-family:'Poppins',sans-serif; font-weight:800; font-size:0.78rem; text-align:center; border-bottom:2px solid var(--black); }
+  .repet-col-header.obs { background:var(--violet); color:#fff; }
+  .repet-col-header.bien { background:var(--mint); color:#fff; border-left:1.5px solid var(--black); }
+  .repet-col-header.prog { background:var(--orange); color:#fff; border-left:1.5px solid var(--black); }
+  .repet-row-label { grid-column:1/-1; background:#f5f5f5; padding:7px 12px; font-family:'Poppins',sans-serif; font-weight:700; font-size:0.75rem; border-bottom:1px solid #e0e0e0; border-top:1px solid #e0e0e0; color:var(--black); }
+  .repet-cell { padding:6px 10px; background:#fff; border-bottom:1px solid #f0f0f0; font-size:0.75rem; color:#555; vertical-align:top; }
+  .repet-cell.obs-cell  { border-right:1.5px solid #e0e0e0; }
+  .repet-cell.bien-cell { border-right:1.5px solid #e0e0e0; }
+  .repet-input { width:100%; border:1.5px solid #ddd; border-radius:6px; padding:5px 8px; font-family:'Montserrat',sans-serif; font-size:0.75rem; resize:none; outline:none; }
+  .repet-input:focus { border-color:var(--violet); }
+
+  /* ── SUPPORT SELECTOR ── */
+  .support-selector { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+  .sel-btn { padding:8px 14px; border:2px solid var(--black); border-radius:8px; font-family:'Poppins',sans-serif; font-weight:700; font-size:0.75rem; cursor:pointer; background:#fff; box-shadow:2px 2px 0 var(--black); transition:all 0.12s; }
+  .sel-btn:hover { transform:translateY(-1px); box-shadow:3px 3px 0 var(--black); }
+  .sel-btn.on { background:var(--violet); color:#fff; }
+
+  /* ── PLAN SECTION ── */
+  .plan-block { border:2px solid var(--black); border-radius:10px; overflow:hidden; box-shadow:var(--shadow); margin-top:14px; }
+  .plan-header { background:var(--yellow); padding:9px 14px; font-family:'Poppins',sans-serif; font-weight:800; font-size:0.82rem; border-bottom:2px solid var(--black); display:flex; align-items:center; gap:8px; }
+  .plan-body { background:#fff; }
+  .plan-row { display:flex; align-items:stretch; border-bottom:1px solid #f0f0f0; }
+  .plan-row:last-child { border-bottom:none; }
+  .plan-time { background:#f9f9f9; padding:10px 14px; font-family:'Poppins',sans-serif; font-weight:800; font-size:0.78rem; min-width:72px; border-right:1.5px solid #e0e0e0; display:flex; align-items:center; justify-content:center; text-align:center; }
+  .plan-who { background:#fafafa; padding:10px 12px; min-width:80px; font-size:0.74rem; font-weight:700; border-right:1.5px solid #e0e0e0; display:flex; align-items:center; justify-content:center; text-align:center; color:var(--violet); }
+  .plan-what { padding:10px 14px; font-size:0.78rem; line-height:1.4; display:flex; align-items:center; color:#333; flex:1; }
+  .plan-what strong { font-family:'Poppins',sans-serif; }
+
+  /* ── POSTURE DIAL ── */
+  .posture-items { display:flex; flex-direction:column; gap:10px; margin-top:12px; }
+  .posture-item { display:flex; flex-direction:column; gap:5px; }
+  .posture-item label { font-size:0.8rem; font-weight:700; display:flex; align-items:center; gap:6px; font-family:'Poppins',sans-serif; }
+  .posture-scale { display:flex; align-items:center; gap:8px; }
+  .posture-scale span.end { font-size:0.7rem; color:#888; font-weight:600; width:80px; }
+  .posture-scale span.end.right { text-align:right; }
+  input[type=range] { flex:1; accent-color:var(--violet); cursor:pointer; }
+
+  /* ── ENGAGEMENT ── */
+  .engagement-card { background:var(--violet); border:3px solid var(--black); border-radius:16px; box-shadow:var(--shadow-lg); padding:24px; margin-top:8px; text-align:center; color:#fff; }
+  .engagement-card h3 { font-family:'Poppins',sans-serif; font-weight:900; font-size:1.05rem; margin-bottom:16px; }
+  .eng-input { width:100%; border:2px solid rgba(255,255,255,0.5); border-radius:8px; padding:10px 14px; font-family:'Montserrat',sans-serif; font-size:0.82rem; background:rgba(255,255,255,0.15); color:#fff; font-weight:600; outline:none; margin-bottom:8px; }
+  .eng-input::placeholder { color:rgba(255,255,255,0.55); }
+  .eng-input:focus { background:rgba(255,255,255,0.25); }
+  .btn-engage { background:var(--yellow); color:var(--black); border:2.5px solid var(--black); border-radius:8px; padding:11px 20px; font-family:'Poppins',sans-serif; font-weight:800; font-size:0.88rem; cursor:pointer; box-shadow:3px 3px 0 var(--black); transition:transform 0.1s,box-shadow 0.1s; }
+  .btn-engage:hover { transform:translateY(-2px); box-shadow:5px 5px 0 var(--black); }
+  .eng-result { display:none; background:var(--yellow); color:var(--black); border:2px solid var(--black); border-radius:10px; padding:14px; margin-top:14px; font-size:0.84rem; font-weight:700; }
+
+  /* ── CODE CONDUITE ── */
+  .code-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px; }
+  @media(max-width:560px){ .code-grid { grid-template-columns:1fr; } }
+  .code-item { border:2px solid var(--black); border-radius:12px; overflow:hidden; box-shadow:3px 3px 0 var(--black); }
+  .code-item-header { padding:9px 14px; font-family:'Poppins',sans-serif; font-weight:800; font-size:0.82rem; display:flex; align-items:center; gap:8px; border-bottom:2px solid var(--black); }
+  .code-item-header.do   { background:var(--mint); color:#fff; }
+  .code-item-header.dont { background:var(--red);  color:#fff; }
+  .code-item ul { padding:10px 14px; list-style:none; display:flex; flex-direction:column; gap:5px; }
+  .code-item ul li { font-size:0.79rem; line-height:1.4; display:flex; align-items:flex-start; gap:6px; padding:4px 0; border-bottom:1px dashed #e0e0e0; }
+  .code-item ul li:last-child { border-bottom:none; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes bounce-in { 0% { transform:scale(0.8);opacity:0; } 70% { transform:scale(1.05); } 100% { transform:scale(1);opacity:1; } }
+  .bounce { animation:bounce-in 0.4s ease forwards; }
+  .hidden { display:none !important; }
+
+  /* ── FOOTER ── */
+  .footer { background:var(--black); color:var(--yellow); text-align:center; padding:16px; font-family:'Poppins',sans-serif; font-size:0.75rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; }
+
+  /* ── DIVIDER ── */
+  .divider { height:3px; background:repeating-linear-gradient(90deg,var(--black) 0 8px,transparent 8px 14px); margin:28px 0; opacity:0.15; }
+</style>
+</head>
+<body>
+
+<!-- STICKY PROGRESS -->
+<div class="progress-bar-wrapper">
+  <span class="progress-label">LS4YOU · Axe 2</span>
+  <div class="progress-steps" id="progressDots">
+    <div class="step-dot active"></div>
+    <div class="step-dot"></div>
+    <div class="step-dot"></div>
+    <div class="step-dot"></div>
+    <div class="step-dot"></div>
+  </div>
+  <span class="progress-label">⏱ 2h</span>
+</div>
+
+<!-- PARCOURS BANNER -->
+<div class="parcours-banner">
+  <div class="parc-step done">
+    <span class="pnum">✓</span> Image de soi / Image publique
+  </div>
+  <span class="parc-arrow">›</span>
+  <div class="parc-step done">
+    <span class="pnum">✓</span> Zine de Territoire
+  </div>
+  <span class="parc-arrow">›</span>
+  <div class="parc-step current">
+    <span class="pnum">3</span> On passe à la scène
+  </div>
+  <span class="parc-arrow">›</span>
+  <div class="parc-step">
+    <span class="pnum">4</span> Enquête professionnelle
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="header-badge">🎤</div>
+    <div class="header-text">
+      <h1>On passe<br><span>à la scène</span></h1>
+      <div class="header-meta">
+        <span class="tag solid">LS4YOU · Axe 2</span>
+        <span class="tag">Auto-valorisation</span>
+        <span class="tag">Communication</span>
+        <span class="tag dark">Suite du Zine de Territoire</span>
+      </div>
+    </div>
+  </div>
+  <div class="header-deco">🎭</div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- INTRO -->
+  <div class="intro-card">
+    <div>
+      <h2>🎯 Description de l'atelier</h2>
+      <p>
+        Le Zine est fait. Maintenant il faut le présenter.<br>
+        Cet atelier prépare le groupe à <strong>restituer son travail collectif</strong> devant un public —
+        en choisissant ses supports, en répartissant les rôles, en s'entraînant à prendre la parole.
+        C'est la suite directe du Zine de Territoire.
+      </p>
+    </div>
+    <div>
+      <h2>📋 Déroulé</h2>
+      <div class="meta-row">
+        <div class="meta-pill yellow">🕐 2h</div>
+        <div class="meta-pill violet">👥 Groupe 6–15</div>
+        <div class="meta-pill turq">🏛️ Présentiel</div>
+        <div class="meta-pill mint">✂️ Création · Coopération</div>
+      </div>
+      <div style="margin-top:12px; font-size:0.82rem; line-height:1.6; color:#444;">
+        5 phases · Choix du format · Répartition des rôles · Construction des supports · Répétition · Passage à la scène
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PHASE 1 ═══ -->
+  <div class="phase" id="phase1">
+    <div class="phase-header violet">
+      <div class="phase-icon">🧭</div>
+      <div class="phase-title">
+        <h3>Phase 1 · À qui on parle, et comment ?</h3>
+        <small>Définir le public, choisir le format de restitution</small>
+      </div>
+      <div class="phase-duration">20 min</div>
+    </div>
+    <div class="phase-body">
+
+      <div style="font-size:0.84rem; line-height:1.6; margin-bottom:16px; padding:12px 16px; background:#EDE7F6; border:2px solid var(--black); border-radius:10px; box-shadow:3px 3px 0 var(--black);">
+        💬 <strong>Consigne de départ :</strong> Avant de préparer quoi que ce soit, on pose deux questions au groupe :
+        <em>"Pour qui on présente ?"</em> et <em>"Qu'est-ce qu'on veut que les gens retiennent ?"</em>
+        Tout le reste découle de là.
+      </div>
+
+      <!-- Qui est le public ? -->
+      <div style="margin-bottom:18px;">
+        <strong style="font-family:'Poppins',sans-serif; font-size:0.85rem; display:block; margin-bottom:10px;">👥 Notre public, c'est…</strong>
+        <div class="support-selector" id="public-sel">
+          <button class="sel-btn" onclick="toggleSel(this,'pub')">🏛️ Partenaires MLPB</button>
+          <button class="sel-btn" onclick="toggleSel(this,'pub')">👨‍👩‍👧 Familles</button>
+          <button class="sel-btn" onclick="toggleSel(this,'pub')">🏢 Professionnels du territoire</button>
+          <button class="sel-btn" onclick="toggleSel(this,'pub')">🎓 Autres jeunes</button>
+          <button class="sel-btn" onclick="toggleSel(this,'pub')">📣 Grand public / Événement</button>
+          <button class="sel-btn" onclick="toggleSel(this,'pub')">🏫 Équipe MLPB</button>
+        </div>
+      </div>
+
+      <!-- Ce qu'on veut transmettre -->
+      <div style="margin-bottom:18px;">
+        <strong style="font-family:'Poppins',sans-serif; font-size:0.85rem; display:block; margin-bottom:10px;">🎯 Ce qu'on veut que les gens retiennent</strong>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+          <div style="background:#EDE7F6; border:2px solid var(--black); border-radius:10px; padding:12px 14px; box-shadow:2px 2px 0 var(--black); cursor:pointer; transition:all 0.12s; text-align:center; font-size:0.78rem; font-weight:700;" onclick="pickMessage(this)">
+            💡 Ce qu'on a découvert sur le territoire
+          </div>
+          <div style="background:#E0F7FA; border:2px solid var(--black); border-radius:10px; padding:12px 14px; box-shadow:2px 2px 0 var(--black); cursor:pointer; transition:all 0.12s; text-align:center; font-size:0.78rem; font-weight:700;" onclick="pickMessage(this)">
+            💪 Ce qu'on a été capables de faire ensemble
+          </div>
+          <div style="background:#F1F8E9; border:2px solid var(--black); border-radius:10px; padding:12px 14px; box-shadow:2px 2px 0 var(--black); cursor:pointer; transition:all 0.12s; text-align:center; font-size:0.78rem; font-weight:700;" onclick="pickMessage(this)">
+            🗺️ Ce que ce territoire nous a appris sur nous
+          </div>
+        </div>
+        <div id="message-result" style="display:none; margin-top:10px; padding:10px 14px; background:var(--yellow); border:2px solid var(--black); border-radius:8px; font-size:0.8rem; font-weight:700; box-shadow:2px 2px 0 var(--black);"></div>
+      </div>
+
+      <!-- Format de restitution -->
+      <div>
+        <strong style="font-family:'Poppins',sans-serif; font-size:0.85rem; display:block; margin-bottom:10px;">🎬 Le format qu'on choisit</strong>
+        <div class="cards-grid">
+          <div class="card violet" style="cursor:pointer;" onclick="selectFormat(this,'📣 Pitch oral','Le groupe prend la parole en public, Zine en main. Court, direct, fort.')">
+            <div class="card-icon">📣</div>
+            <h4>Pitch oral</h4>
+            <p>Chaque jeune présente sa contribution. Court, direct, en face de vrai monde.</p>
+          </div>
+          <div class="card turq" style="cursor:pointer;" onclick="selectFormat(this,'🖼️ Expo statique','Les Zines sont exposés. Le public circule et pose des questions.')">
+            <div class="card-icon">🖼️</div>
+            <h4>Expo statique</h4>
+            <p>Les Zines affichés, le groupe en présence. Le public circule et pose des questions.</p>
+          </div>
+          <div class="card yellow" style="cursor:pointer;" onclick="selectFormat(this,'🎥 Capsule vidéo','Filmer une présentation courte. Diffuser sur les réseaux MLPB ou en réunion.')">
+            <div class="card-icon">🎥</div>
+            <h4>Capsule vidéo</h4>
+            <p>Filmer une présentation courte du projet. Format réseaux sociaux ou réunion.</p>
+          </div>
+          <div class="card mint" style="cursor:pointer;" onclick="selectFormat(this,'📊 Diaporama commenté','Slides simples avec les pages clés du Zine. Présentation debout.')">
+            <div class="card-icon">📊</div>
+            <h4>Diaporama commenté</h4>
+            <p>Slides simples qui reprennent les pages du Zine, présentées debout.</p>
+          </div>
+        </div>
+        <div id="format-result" style="display:none; margin-top:12px; padding:12px 16px; background:var(--violet); color:#fff; border:2px solid var(--black); border-radius:10px; font-family:'Poppins',sans-serif; font-weight:700; font-size:0.85rem; box-shadow:var(--shadow);">
+        </div>
+      </div>
+
+      <div class="tip-box violet" style="margin-top:18px;">
+        <div class="tip-box-header">🛠️ Pour l'animateur · Ce temps sert à cadrer, pas à décider seul</div>
+        <div class="tip-box-body">
+          <ul>
+            <li>✦ Laissez le groupe choisir le format — votre rôle est de poser les contraintes réelles (salle, temps, matériel).</li>
+            <li>✦ Si le groupe est divisé, proposez un vote à main levée. Pas de consensus obligatoire.</li>
+            <li>✦ Notez au tableau le public choisi et le format retenu — ça cadre toute la suite.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ PHASE 2 ═══ -->
+  <div class="phase" id="phase2">
+    <div class="phase-header yellow">
+      <div class="phase-icon">🧩</div>
+      <div class="phase-title">
+        <h3>Phase 2 · Qui fait quoi dans le groupe ?</h3>
+        <small>Répartition des rôles selon les forces identifiées dans le Zine</small>
+      </div>
+      <div class="phase-duration">20 min</div>
+    </div>
+    <div class="phase-body">
+
+      <div style="font-size:0.84rem; line-height:1.5; margin-bottom:16px; padding:12px 16px; background:#FFFDE7; border:2px solid var(--black); border-radius:10px; box-shadow:3px 3px 0 var(--black);">
+        💡 <strong>Rappel :</strong> Dans le Zine, chaque jeune a identifié une compétence clé et une force principale.
+        La répartition des rôles ici doit coller à ça — pas de rôle imposé, chacun choisit en fonction de ce qu'il/elle a envie de montrer.
+      </div>
+
+      <div class="roles-grid">
+
+        <div class="role-card" id="role-speaker">
+          <div class="role-header" style="background:#EDE7F6;">
+            <span class="role-icon">🎤</span>
+            <div>
+              <div class="role-title">Le/la présentateur·rice</div>
+              <div style="font-size:0.7rem; color:#666;">Aisance relationnelle · Communication</div>
+            </div>
+          </div>
+          <div class="role-body">
+            <ul>
+              <li>Porte la parole du groupe devant le public</li>
+              <li>Raconte l'histoire du projet (le fil rouge)</li>
+              <li>Présente le Zine en 2 minutes max</li>
+            </ul>
+          </div>
+          <button class="role-claim" style="background:#f0e8ff;" onclick="claimRole('role-speaker',this)">Je prends ce rôle</button>
+        </div>
+
+        <div class="role-card" id="role-visuel">
+          <div class="role-header" style="background:#FFF3E0;">
+            <span class="role-icon">🎨</span>
+            <div>
+              <div class="role-title">Le/la créatif·ve</div>
+              <div style="font-size:0.7rem; color:#666;">Créativité · Communication visuelle</div>
+            </div>
+          </div>
+          <div class="role-body">
+            <ul>
+              <li>Prépare les supports visuels (affiche, slide, panneau)</li>
+              <li>Veille à ce que le Zine soit lisible et bien présenté</li>
+              <li>Choisit les images et la mise en page</li>
+            </ul>
+          </div>
+          <button class="role-claim" style="background:#FFF3E0;" onclick="claimRole('role-visuel',this)">Je prends ce rôle</button>
+        </div>
+
+        <div class="role-card" id="role-tech">
+          <div class="role-header" style="background:#E0F7FA;">
+            <span class="role-icon">💻</span>
+            <div>
+              <div class="role-title">Le/la technicien·ne</div>
+              <div style="font-size:0.7rem; color:#666;">Maîtrise numérique · Rigueur</div>
+            </div>
+          </div>
+          <div class="role-body">
+            <ul>
+              <li>Gère la version numérique sur Canva</li>
+              <li>S'occupe du QR code et des liens</li>
+              <li>Teste le matériel avant la restitution</li>
+            </ul>
+          </div>
+          <button class="role-claim" style="background:#E0F7FA;" onclick="claimRole('role-tech',this)">Je prends ce rôle</button>
+        </div>
+
+        <div class="role-card" id="role-coord">
+          <div class="role-header" style="background:#F1F8E9;">
+            <span class="role-icon">⏱️</span>
+            <div>
+              <div class="role-title">Le/la coordinateur·rice</div>
+              <div style="font-size:0.7rem; color:#666;">Sens des responsabilités · Organisation</div>
+            </div>
+          </div>
+          <div class="role-body">
+            <ul>
+              <li>Surveille le temps pendant la restitution</li>
+              <li>S'assure que tout le monde a bien son rôle</li>
+              <li>Gère les imprévus (micro qui lâche, retardataire…)</li>
+            </ul>
+          </div>
+          <button class="role-claim" style="background:#F1F8E9;" onclick="claimRole('role-coord',this)">Je prends ce rôle</button>
+        </div>
+
+        <div class="role-card" id="role-temoins">
+          <div class="role-header" style="background:#FFEBEE;">
+            <span class="role-icon">💬</span>
+            <div>
+              <div class="role-title">Les témoins du groupe</div>
+              <div style="font-size:0.7rem; color:#666;">Écoute active · Prise d'initiative</div>
+            </div>
+          </div>
+          <div class="role-body">
+            <ul>
+              <li>Répondent aux questions du public en direct</li>
+              <li>Partagent leur vécu personnel sur le projet</li>
+              <li>Enrichissent la parole du présentateur</li>
+            </ul>
+          </div>
+          <button class="role-claim" style="background:#FFEBEE;" onclick="claimRole('role-temoins',this)">Je prends ce rôle</button>
+        </div>
+
+        <div class="role-card" id="role-doc">
+          <div class="role-header" style="background:#FFFDE7;">
+            <span class="role-icon">📸</span>
+            <div>
+              <div class="role-title">Le/la documentaliste</div>
+              <div style="font-size:0.7rem; color:#666;">Autonomie · Rigueur</div>
+            </div>
+          </div>
+          <div class="role-body">
+            <ul>
+              <li>Photographie la restitution pour la mémoire</li>
+              <li>Collecte les retours du public (post-its, formulaire)</li>
+              <li>Archive les Zines pour le portfolio MLPB</li>
+            </ul>
+          </div>
+          <button class="role-claim" style="background:#FFFDE7;" onclick="claimRole('role-doc',this)">Je prends ce rôle</button>
+        </div>
+
+      </div>
+
+      <div id="roles-recap" style="display:none; margin-top:16px; background:var(--yellow); border:3px solid var(--black); border-radius:12px; padding:16px 20px; box-shadow:var(--shadow);">
+        <strong style="font-family:'Poppins',sans-serif; font-size:0.85rem; display:block; margin-bottom:10px;">📋 Distribution des rôles</strong>
+        <div id="roles-recap-content" style="font-size:0.82rem; line-height:1.8;"></div>
+      </div>
+
+      <div class="tip-box" style="margin-top:18px;">
+        <div class="tip-box-header">🛠️ Pour l'animateur · Ancrer dans la fiche Zine</div>
+        <div class="tip-box-body">
+          <ul>
+            <li>✦ Demandez à chaque jeune de ressortir sa fiche "Moi au sommet de mon art" — les forces cochées guident le choix de rôle.</li>
+            <li>✦ Si plusieurs jeunes veulent le même rôle, proposez-leur de le partager ou de faire un roulement pendant la restitution.</li>
+            <li>✦ Un jeune sans rôle fixe peut être "volant" — il renforce où c'est nécessaire.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ PHASE 3 ═══ -->
+  <div class="phase" id="phase3">
+    <div class="phase-header turq">
+      <div class="phase-icon">🛠️</div>
+      <div class="phase-title">
+        <h3>Phase 3 · On construit les supports</h3>
+        <small>Choisir, fabriquer, assembler — chaque rôle travaille</small>
+      </div>
+      <div class="phase-duration">50 min</div>
+    </div>
+    <div class="phase-body">
+
+      <div style="font-size:0.84rem; line-height:1.5; margin-bottom:18px; padding:12px 16px; background:#E0F7FA; border:2px solid var(--black); border-radius:10px; box-shadow:3px 3px 0 var(--black);">
+        👉 <strong>Consigne :</strong> Chaque rôle a sa liste de tâches. On travaille en parallèle.
+        L'animateur·rice passe dans chaque groupe toutes les 10 minutes avec une question de relance.
+        Objectif en 50 min : tous les supports sont prêts pour la répétition.
+      </div>
+
+      <!-- Supports par type -->
+      <strong style="font-family:'Poppins',sans-serif; font-size:0.85rem; display:block; margin-bottom:10px;">🗂️ Les supports à préparer selon le format choisi</strong>
+
+      <div class="support-grid">
+
+        <div class="support-card">
+          <div class="support-card-header" style="background:#EDE7F6;">
+            <span>📣</span> Pour le pitch oral
+          </div>
+          <div class="support-card-body">
+            <div class="support-toggle">
+              <button class="stoggle-btn" id="toggle-oral-off" onclick="toggleSupport('oral','non')">Pas choisi</button>
+              <button class="stoggle-btn" id="toggle-oral-on" onclick="toggleSupport('oral','oui')">Notre format ✓</button>
+            </div>
+            <div class="support-detail" id="detail-oral">
+              <ul>
+                <li>📄 Fiche pitch individuelle (1 compétence, 1 fait, 1 phrase)</li>
+                <li>🗂️ Le Zine physique tenu en main pendant la présentation</li>
+                <li>⏱️ Minuteur visible par tous — 2 min max par personne</li>
+                <li>🎤 Micro ou voix portée selon la taille du lieu</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="support-card">
+          <div class="support-card-header" style="background:#FFF3E0;">
+            <span>🖼️</span> Pour l'expo statique
+          </div>
+          <div class="support-card-body">
+            <div class="support-toggle">
+              <button class="stoggle-btn" id="toggle-expo-off" onclick="toggleSupport('expo','non')">Pas choisi</button>
+              <button class="stoggle-btn" id="toggle-expo-on" onclick="toggleSupport('expo','oui')">Notre format ✓</button>
+            </div>
+            <div class="support-detail" id="detail-expo">
+              <ul>
+                <li>📌 Panneaux A3 avec pages du Zine agrandies (x3 au minimum)</li>
+                <li>🔖 Cartels de 3 lignes max par visuel (quoi / qui / pourquoi)</li>
+                <li>💬 Post-its vierges pour que le public réagisse</li>
+                <li>👕 Badge prénom pour les jeunes présents</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="support-card">
+          <div class="support-card-header" style="background:#FFFDE7;">
+            <span>🎥</span> Pour la capsule vidéo
+          </div>
+          <div class="support-card-body">
+            <div class="support-toggle">
+              <button class="stoggle-btn" id="toggle-video-off" onclick="toggleSupport('video','non')">Pas choisi</button>
+              <button class="stoggle-btn" id="toggle-video-on" onclick="toggleSupport('video','oui')">Notre format ✓</button>
+            </div>
+            <div class="support-detail" id="detail-video">
+              <ul>
+                <li>📝 Script de 60–90 secondes écrit collectivement</li>
+                <li>📱 Smartphone horizontal, fond neutre, lumière naturelle</li>
+                <li>🎬 1 prise par jeune — pas besoin de perfection</li>
+                <li>🖥️ Montage simple sur Canva ou CapCut (optionnel)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="support-card">
+          <div class="support-card-header" style="background:#E0F7FA;">
+            <span>📊</span> Pour le diaporama
+          </div>
+          <div class="support-card-body">
+            <div class="support-toggle">
+              <button class="stoggle-btn" id="toggle-diapo-off" onclick="toggleSupport('diapo','non')">Pas choisi</button>
+              <button class="stoggle-btn" id="toggle-diapo-on" onclick="toggleSupport('diapo','oui')">Notre format ✓</button>
+            </div>
+            <div class="support-detail" id="detail-diapo">
+              <ul>
+                <li>🖥️ 6 slides max : Titre · Contexte · Action · Compétences · Résultats · Et maintenant</li>
+                <li>📐 1 idée par slide — pas de pavé de texte</li>
+                <li>🖼️ Photos du projet sur chaque diapo</li>
+                <li>🎨 Couleurs LS4YOU ou celles du Zine pour la cohérence</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Plan de fabrication -->
+      <div class="plan-block" style="margin-top:20px;">
+        <div class="plan-header">📐 Plan de fabrication · 50 minutes</div>
+        <div class="plan-body">
+          <div class="plan-row">
+            <div class="plan-time">0–10 min</div>
+            <div class="plan-who">Coordinateur</div>
+            <div class="plan-what"><strong>Cadrage :</strong> rappelle le public, le format, le temps. Distribue les tâches de chaque rôle. Lance le minuteur.</div>
+          </div>
+          <div class="plan-row">
+            <div class="plan-time">0–30 min</div>
+            <div class="plan-who">Tous</div>
+            <div class="plan-what"><strong>Fabrication :</strong> chaque rôle travaille en parallèle. Créatif·ve sur les visuels, Technicien·ne sur le numérique, Présentateur·rice sur son script.</div>
+          </div>
+          <div class="plan-row">
+            <div class="plan-time">30 min</div>
+            <div class="plan-who">Animateur</div>
+            <div class="plan-what"><strong>Passage de relance :</strong> "Est-ce qu'un inconnu comprendrait votre support ?" · "Ta compétence est-elle visible quelque part ?"</div>
+          </div>
+          <div class="plan-row">
+            <div class="plan-time">40–50 min</div>
+            <div class="plan-who">Tous</div>
+            <div class="plan-what"><strong>Assemblage :</strong> on réunit tous les supports et on vérifie la cohérence. Le Coordinateur fait un tour de table rapide.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Questions de relance -->
+      <div class="tip-box">
+        <div class="tip-box-header">💬 Les 3 questions de relance de l'animateur pendant la fabrication</div>
+        <div class="tip-box-body">
+          <ul>
+            <li>✦ <strong>"Est-ce qu'une personne qui ne connaît pas le projet comprendrait ce support ?"</strong> — teste la lisibilité.</li>
+            <li>✦ <strong>"Ta compétence clé du Zine, est-ce qu'elle est visible quelque part ici ?"</strong> — relie à la valorisation.</li>
+            <li>✦ <strong>"Si tu avais 30 secondes pour tout expliquer, tu dirais quoi ?"</strong> — force à synthétiser.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ PHASE 4 ═══ -->
+  <div class="phase" id="phase4">
+    <div class="phase-header orange">
+      <div class="phase-icon">🔁</div>
+      <div class="phase-title">
+        <h3>Phase 4 · On répète</h3>
+        <small>Répétition générale + grille de feedback entre pairs</small>
+      </div>
+      <div class="phase-duration">25 min</div>
+    </div>
+    <div class="phase-body">
+
+      <div style="font-size:0.84rem; line-height:1.5; margin-bottom:16px; padding:12px 16px; background:#FFF3E0; border:2px solid var(--black); border-radius:10px; box-shadow:3px 3px 0 var(--black);">
+        👉 <strong>Consigne :</strong> On fait une répétition complète, comme si c'était pour de vrai.
+        Pendant que l'un présente, les autres remplissent la grille de feedback — pas pour juger,
+        pour aider.
+      </div>
+
+      <!-- Scénarios prise de parole -->
+      <div style="margin-bottom:18px;">
+        <strong style="font-family:'Poppins',sans-serif; font-size:0.85rem; display:block; margin-bottom:10px;">🎬 Scénarios de répétition · Que fais-tu dans cette situation ?</strong>
+
+        <div class="scenario-block">
+          <div class="scenario-header">🎬 Situation 1 · Le blanc total</div>
+          <div class="scenario-body">
+            <div class="scenario-situation">
+              Tu commences à parler, tu as les yeux du groupe sur toi… et t'as un blanc complet. Ton cerveau se vide. Que fais-tu ?
+            </div>
+            <div class="scenario-choices" id="rsc1">
+              <div class="choice" onclick="chooseR(this,'rsc1',false)">
+                <span class="choice-letter">A</span>
+                <span>Tu paniques et tu regardes par terre en espérant que quelqu'un intervienne.</span>
+              </div>
+              <div class="choice" onclick="chooseR(this,'rsc1',true)">
+                <span class="choice-letter">B</span>
+                <span>Tu souffles doucement, tu dis "une seconde" et tu regardes ta fiche ou ton Zine pour retrouver le fil.</span>
+              </div>
+              <div class="choice" onclick="chooseR(this,'rsc1',false)">
+                <span class="choice-letter">C</span>
+                <span>Tu passes directement à la question suivante et tu fais comme si de rien n'était.</span>
+              </div>
+            </div>
+            <div id="rfb-rsc1" class="choice-feedback hidden"></div>
+          </div>
+        </div>
+
+        <div class="scenario-block">
+          <div class="scenario-header">🎬 Situation 2 · Une question que tu n'attendais pas</div>
+          <div class="scenario-body">
+            <div class="scenario-situation">
+              Quelqu'un du public te pose une question sur un aspect du projet que t'as pas préparé du tout. Tu ne sais pas répondre. Que fais-tu ?
+            </div>
+            <div class="scenario-choices" id="rsc2">
+              <div class="choice" onclick="chooseR(this,'rsc2',false)">
+                <span class="choice-letter">A</span>
+                <span>Tu inventes une réponse vague pour pas avoir l'air de pas savoir.</span>
+              </div>
+              <div class="choice" onclick="chooseR(this,'rsc2',true)">
+                <span class="choice-letter">B</span>
+                <span>Tu dis simplement "Je ne sais pas répondre à ça précisément, mais je peux vous mettre en contact avec notre animateur·rice qui pourra vous répondre."</span>
+              </div>
+              <div class="choice" onclick="chooseR(this,'rsc2',false)">
+                <span class="choice-letter">C</span>
+                <span>Tu ignores la question et tu passes à la suite.</span>
+              </div>
+            </div>
+            <div id="rfb-rsc2" class="choice-feedback hidden"></div>
+          </div>
+        </div>
+
+        <div class="scenario-block">
+          <div class="scenario-header">🎬 Situation 3 · Tu parles trop vite</div>
+          <div class="scenario-body">
+            <div class="scenario-situation">
+              Tu es stressé(e) et ton débit s'emballe. Le coordinateur te fait signe discrètement de ralentir. Qu'est-ce que tu fais ?
+            </div>
+            <div class="scenario-choices" id="rsc3">
+              <div class="choice" onclick="chooseR(this,'rsc3',false)">
+                <span class="choice-letter">A</span>
+                <span>Tu ignores le signe — t'es lancé(e) et t'as peur de perdre le fil si tu t'arrêtes.</span>
+              </div>
+              <div class="choice" onclick="chooseR(this,'rsc3',true)">
+                <span class="choice-letter">B</span>
+                <span>Tu poses une phrase clé, tu fais une courte pause de 2 secondes pour reprendre ton souffle, et tu repars plus posément.</span>
+              </div>
+              <div class="choice" onclick="chooseR(this,'rsc3',false)">
+                <span class="choice-letter">C</span>
+                <span>Tu t'arrêtes complètement et tu demandes au groupe si tout le monde suit.</span>
+              </div>
+            </div>
+            <div id="rfb-rsc3" class="choice-feedback hidden"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grille de feedback -->
+      <strong style="font-family:'Poppins',sans-serif; font-size:0.85rem; display:block; margin-bottom:10px;">📋 Grille de feedback entre pairs · À remplir pendant la répétition</strong>
+      <div style="font-size:0.8rem; color:#555; margin-bottom:10px;">Pour chaque point observé, note ce qui fonctionnait bien et ce qui pourrait être amélioré.</div>
+
+      <div class="repet-grid">
+        <div class="repet-col-header obs">Ce que j'observe</div>
+        <div class="repet-col-header bien">Ce qui marche</div>
+        <div class="repet-col-header prog">À améliorer</div>
+
+        <div class="repet-row-label">🗣️ La prise de parole</div>
+        <div class="repet-cell obs-cell" style="font-size:0.75rem; color:#666; font-style:italic;">Volume, débit, clarté, regard...</div>
+        <div class="repet-cell bien-cell"><textarea class="repet-input" rows="2" placeholder="Ex : on l'entendait bien…"></textarea></div>
+        <div class="repet-cell"><textarea class="repet-input" rows="2" placeholder="Ex : un peu trop vite…"></textarea></div>
+
+        <div class="repet-row-label">🧍 La posture et le corps</div>
+        <div class="repet-cell obs-cell" style="font-size:0.75rem; color:#666; font-style:italic;">Position, gestes, contact visuel...</div>
+        <div class="repet-cell bien-cell"><textarea class="repet-input" rows="2" placeholder="Ex : les bras ouverts, souriant…"></textarea></div>
+        <div class="repet-cell"><textarea class="repet-input" rows="2" placeholder="Ex : tournait le dos au public…"></textarea></div>
+
+        <div class="repet-row-label">💬 Le contenu du message</div>
+        <div class="repet-cell obs-cell" style="font-size:0.75rem; color:#666; font-style:italic;">L'histoire, les faits, la compétence...</div>
+        <div class="repet-cell bien-cell"><textarea class="repet-input" rows="2" placeholder="Ex : on comprenait bien ce qu'ils avaient fait…"></textarea></div>
+        <div class="repet-cell"><textarea class="repet-input" rows="2" placeholder="Ex : manquait un exemple concret…"></textarea></div>
+
+        <div class="repet-row-label">🗂️ Les supports utilisés</div>
+        <div class="repet-cell obs-cell" style="font-size:0.75rem; color:#666; font-style:italic;">Zine, affiche, slide, vidéo...</div>
+        <div class="repet-cell bien-cell"><textarea class="repet-input" rows="2" placeholder="Ex : le Zine était bien montré…"></textarea></div>
+        <div class="repet-cell"><textarea class="repet-input" rows="2" placeholder="Ex : pas assez visible de loin…"></textarea></div>
+
+        <div class="repet-row-label">⏱️ La gestion du temps</div>
+        <div class="repet-cell obs-cell" style="font-size:0.75rem; color:#666; font-style:italic;">Respecté le temps ? Rythme fluide ?</div>
+        <div class="repet-cell bien-cell"><textarea class="repet-input" rows="2" placeholder="Ex : bien dans les 2 minutes…"></textarea></div>
+        <div class="repet-cell"><textarea class="repet-input" rows="2" placeholder="Ex : fin un peu précipitée…"></textarea></div>
+      </div>
+
+      <div class="tip-box" style="margin-top:18px;">
+        <div class="tip-box-header">📌 Règle du feedback bienveillant</div>
+        <div class="tip-box-body">
+          <ul>
+            <li>✦ On commence <strong>toujours</strong> par ce qui a fonctionné avant de donner un point à améliorer.</li>
+            <li>✦ On dit "j'ai remarqué que…" — pas "t'as fait une erreur quand…"</li>
+            <li>✦ Un seul point à améliorer par personne — pas une liste de reproches.</li>
+            <li>✦ L'animateur conclut chaque feedback en nommant la compétence démontrée : "Ce que tu viens de faire, dans un CV, ça s'appelle prise de parole en public."</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ PHASE 5 ═══ -->
+  <div class="phase" id="phase5">
+    <div class="phase-header red">
+      <div class="phase-icon">🚀</div>
+      <div class="phase-title">
+        <h3>Phase 5 · Avant de se lancer</h3>
+        <small>Posture mentale, routines de groupe, dernier check</small>
+      </div>
+      <div class="phase-duration">5 min</div>
+    </div>
+    <div class="phase-body">
+
+      <div style="font-size:0.84rem; line-height:1.5; margin-bottom:18px; padding:12px 16px; background:#FFEBEE; border:2px solid var(--black); border-radius:10px; box-shadow:3px 3px 0 var(--black);">
+        💬 <strong>Consigne orale :</strong> "Dans 5 minutes vous allez face au public. On fait un dernier point, chacun dans sa tête.
+        Pas besoin d'être parfait. Vous avez fait le travail — maintenant vous montrez ce que vous savez faire."
+      </div>
+
+      <!-- Curseurs de posture -->
+      <strong style="font-family:'Poppins',sans-serif; font-size:0.85rem; display:block; margin-bottom:12px;">🎚️ Comment je me sens là, maintenant ? (individuel)</strong>
+      <div class="posture-items">
+        <div class="posture-item">
+          <label>😰 Stress — confiance 😤</label>
+          <div class="posture-scale">
+            <span class="end">Très stressé(e)</span>
+            <input type="range" min="1" max="5" value="3" oninput="updateSlider(this)">
+            <span class="end right">Confiant(e)</span>
+          </div>
+        </div>
+        <div class="posture-item">
+          <label>😶 Envie de parler — envie de se cacher 🫣</label>
+          <div class="posture-scale">
+            <span class="end">J'aimerais disparaître</span>
+            <input type="range" min="1" max="5" value="3" oninput="updateSlider(this)">
+            <span class="end right">J'ai envie d'y aller</span>
+          </div>
+        </div>
+        <div class="posture-item">
+          <label>🧐 Je me sens prêt(e) sur le fond</label>
+          <div class="posture-scale">
+            <span class="end">Pas du tout prêt(e)</span>
+            <input type="range" min="1" max="5" value="3" oninput="updateSlider(this)">
+            <span class="end right">Complètement prêt(e)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Checklist finale -->
+      <strong style="font-family:'Poppins',sans-serif; font-size:0.85rem; display:block; margin-top:20px; margin-bottom:10px;">✅ Le dernier check collectif (30 secondes par point)</strong>
+      <div class="code-grid">
+        <div class="code-item">
+          <div class="code-item-header do">✅ On a…</div>
+          <ul>
+            <li>✅ Le Zine physique en main ou affiché</li>
+            <li>✅ Les supports prêts et testés</li>
+            <li>✅ Chaque rôle confirmé et compris</li>
+            <li>✅ Le temps de parole réparti</li>
+            <li>✅ Une phrase d'accroche pour commencer</li>
+            <li>✅ Quelqu'un pour gérer les questions</li>
+          </ul>
+        </div>
+        <div class="code-item">
+          <div class="code-item-header dont">❌ On évite…</div>
+          <ul>
+            <li>❌ Regarder ses pieds quand on parle</li>
+            <li>❌ Commencer à lire un texte long</li>
+            <li>❌ Dépasser son temps de parole</li>
+            <li>❌ Laisser un silence qui dure plus de 5 secondes</li>
+            <li>❌ Se manger la parole en même temps</li>
+            <li>❌ Oublier de se présenter en début de pitch</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Mot de clôture -->
+      <div class="engagement-card">
+        <h3>🎯 Mon mot avant de passer à la scène</h3>
+        <input class="eng-input" id="mot-prenom" placeholder="Ton prénom…">
+        <input class="eng-input" id="mot-role" placeholder="Mon rôle dans la restitution…">
+        <input class="eng-input" id="mot-fierte" placeholder="Ce dont je suis le plus fier/fière dans ce projet…">
+        <input class="eng-input" id="mot-force" placeholder="La force que je montre aujourd'hui (du Zine)…">
+        <button class="btn-engage" onclick="submitMot()">Je suis prêt(e) ✊</button>
+        <div class="eng-result" id="motResult"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- NOTES FORMATEUR -->
+  <div class="phase">
+    <div class="phase-header black">
+      <div class="phase-icon">🛠️</div>
+      <div class="phase-title">
+        <h3>Notes pour l'animateur·rice</h3>
+        <small>Indicateurs de réussite · Matériel · Postures clés</small>
+      </div>
+    </div>
+    <div class="phase-body">
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px;">
+        <div class="tip-box" style="margin-top:0;">
+          <div class="tip-box-header">📊 Indicateurs de réussite</div>
+          <div class="tip-box-body">
+            <ul>
+              <li>✦ <strong>100%</strong> des jeunes ont pris la parole au moins 30 secondes</li>
+              <li>✦ <strong>100%</strong> des rôles ont été choisis librement</li>
+              <li>✦ <strong>≥ 80%</strong> ont pu nommer la compétence qu'ils montrent</li>
+              <li>✦ <strong>≥ 1</strong> support numérique produit par le groupe</li>
+              <li>✦ La grille de feedback a été remplie pour chaque présentateur·rice</li>
+            </ul>
+          </div>
+        </div>
+        <div class="tip-box" style="margin-top:0;">
+          <div class="tip-box-header">📦 Matériel nécessaire</div>
+          <div class="tip-box-body">
+            <ul>
+              <li>✦ Les Zines fabriqués lors de l'atelier précédent (1 par jeune)</li>
+              <li>✦ Fiches "Moi au sommet de mon art" (Axe 2 LS4YOU)</li>
+              <li>✦ Feutres, post-its, colle, papier A3 pour panneaux</li>
+              <li>✦ Tablettes/PC + Canva + générateur QR code</li>
+              <li>✦ Minuteur visible et smartphone pour filmer</li>
+              <li>✦ Grilles de feedback imprimées (1 par observateur)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="tip-box violet">
+        <div class="tip-box-header">💬 Formulations clés pour l'animateur</div>
+        <div class="tip-box-body">
+          <ul>
+            <li>✦ Pour ancrer la compétence : <em>"Ce que tu viens de faire, dans une offre d'emploi ou sur LinkedIn, ça s'appelle [prise de parole en public / animation / gestion de projet]. Tu peux l'écrire sur ton CV."</em></li>
+            <li>✦ Pour dédramatiser le trac : <em>"Le trac prouve que tu tiens à bien faire. C'est une ressource, pas un problème."</em></li>
+            <li>✦ Pour clore l'atelier : <em>"Garde ton Zine. C'est la preuve que tu es capable de mener un projet de A à Z — ET de le présenter."</em></li>
+            <li>✦ Pour relancer un jeune bloqué : <em>"Tu n'as pas besoin d'être parfait(e). Raconte juste ce que toi tu as fait — personne d'autre ne peut le faire à ta place."</em></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">LS4YOU · Axe 2 Auto-valorisation · Mission Locale Pays Basque · On passe à la scène</div>
+
+<script>
+// ── Scroll progress ──
+window.addEventListener('scroll', () => {
+  const phases = ['phase1','phase2','phase3','phase4','phase5'];
+  const dots = document.querySelectorAll('.step-dot');
+  let active = 0;
+  phases.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (el && el.getBoundingClientRect().top < window.innerHeight * 0.6) active = i;
+  });
+  dots.forEach((d, i) => d.classList.toggle('active', i <= active));
+});
+
+// ── Public selector ──
+function toggleSel(btn, group) {
+  btn.classList.toggle('on');
+}
+
+// ── Format selection ──
+function selectFormat(card, name, desc) {
+  document.querySelectorAll('.card').forEach(c => c.style.outline = '');
+  card.style.outline = '4px solid var(--violet)';
+  const r = document.getElementById('format-result');
+  r.style.display = 'block';
+  r.innerHTML = `✅ Format retenu : <strong>${name}</strong> — ${desc}`;
+  r.classList.add('bounce');
+}
+
+// ── Message pick ──
+function pickMessage(el) {
+  document.querySelectorAll('[onclick="pickMessage(this)"]').forEach(e => e.style.outline = '');
+  el.style.outline = '3px solid var(--violet)';
+  const r = document.getElementById('message-result');
+  r.style.display = 'block';
+  r.textContent = '→ Message retenu : ' + el.textContent.trim();
+}
+
+// ── Role claim ──
+const claimedRoles = {};
+function claimRole(roleId, btn) {
+  const card = document.getElementById(roleId);
+  if (claimedRoles[roleId]) {
+    delete claimedRoles[roleId];
+    card.classList.remove('claimed');
+    btn.textContent = 'Je prends ce rôle';
+    btn.style.background = btn.closest('.role-card').querySelector('.role-header').style.background;
+  } else {
+    const prenom = prompt('Ton prénom pour ce rôle ?');
+    if (!prenom) return;
+    claimedRoles[roleId] = prenom.trim();
+    card.classList.add('claimed');
+    btn.textContent = '✅ ' + prenom.trim();
+    btn.style.background = '#C8E6C9';
+  }
+  updateRolesRecap();
+}
+function updateRolesRecap() {
+  const r = document.getElementById('roles-recap');
+  const rc = document.getElementById('roles-recap-content');
+  const labels = {
+    'role-speaker':'🎤 Présentateur·rice',
+    'role-visuel':'🎨 Créatif·ve',
+    'role-tech':'💻 Technicien·ne',
+    'role-coord':'⏱️ Coordinateur·rice',
+    'role-temoins':'💬 Témoin du groupe',
+    'role-doc':'📸 Documentaliste'
+  };
+  const entries = Object.entries(claimedRoles);
+  if (entries.length === 0) { r.style.display = 'none'; return; }
+  r.style.display = 'block';
+  rc.innerHTML = entries.map(([id, name]) => `<span>${labels[id]} → <strong>${name}</strong></span>`).join('<br>');
+}
+
+// ── Support toggle ──
+function toggleSupport(name, val) {
+  const detail = document.getElementById('detail-' + name);
+  const btnOn  = document.getElementById('toggle-' + name + '-on');
+  const btnOff = document.getElementById('toggle-' + name + '-off');
+  if (val === 'oui') {
+    detail.classList.add('visible');
+    btnOn.classList.add('on');
+    btnOff.classList.remove('on');
+  } else {
+    detail.classList.remove('visible');
+    btnOff.classList.add('on');
+    btnOn.classList.remove('on');
+  }
+}
+
+// ── Scenario répétition ──
+const rfeedbacks = {
+  rsc1: {
+    good: "✅ Exactement. Prendre une pause d'1 seconde et regarder sa fiche, c'est une technique de pro. Personne ne remarque un blanc si on le gère calmement — par contre tout le monde voit la panique.",
+    bad: "❌ Les deux autres options coupent le fil de la présentation et rendent le blanc encore plus visible. Une pause courte et assurée est toujours mieux que la fuite ou l'esquive."
+  },
+  rsc2: {
+    good: "✅ C'est la seule réponse honnête et professionnelle. Dire 'je ne sais pas mais je peux vous rediriger' est perçu comme du sérieux, pas de l'ignorance. C'est ce que ferait n'importe quel pro.",
+    bad: "❌ Inventer une réponse vague ou ignorer la question laisse toujours une mauvaise impression. Les gens sentent quand on esquive — et ça abîme la crédibilité de toute la présentation."
+  },
+  rsc3: {
+    good: "✅ La pause est une technique de régulation du stress très efficace. 2 secondes de silence font beaucoup moins de dégâts qu'un débit incontrôlable. Et ça montre que tu sais t'écouter.",
+    bad: "❌ Ignorer le signal du coordinateur, c'est perdre la cohésion du groupe. S'arrêter complètement et interpeller le public, ça casse le rythme et ça attire l'attention sur ton stress plutôt que sur ton contenu."
+  }
+};
+function chooseR(el, scenId, isGood) {
+  const container = document.getElementById(scenId);
+  if (container.dataset.answered) return;
+  container.dataset.answered = '1';
+  container.querySelectorAll('.choice').forEach(c => { c.style.pointerEvents = 'none'; c.style.opacity = '0.6'; });
+  el.style.opacity = '1';
+  el.style.borderColor = isGood ? 'var(--mint)' : 'var(--red)';
+  el.style.background = isGood ? '#E8F5E9' : '#FFEBEE';
+  const fb = document.getElementById('rfb-' + scenId);
+  fb.textContent = isGood ? rfeedbacks[scenId].good : rfeedbacks[scenId].bad;
+  fb.className = 'choice-feedback ' + (isGood ? 'good' : 'bad');
+  fb.classList.remove('hidden');
+}
+
+// ── Sliders ──
+function updateSlider(input) {
+  input.style.accentColor = ['#EF9A9A','#FFCC80','#FFD54F','#A5D6A7','#66BB6A'][input.value - 1];
+}
+
+// ── Mot final ──
+function submitMot() {
+  const p = document.getElementById('mot-prenom').value.trim();
+  const r = document.getElementById('mot-role').value.trim();
+  const f = document.getElementById('mot-fierte').value.trim();
+  const fo = document.getElementById('mot-force').value.trim();
+  if (!p) { alert('Écris ton prénom d\'abord.'); return; }
+  const res = document.getElementById('motResult');
+  res.innerHTML = `✊ <strong>${p}</strong>, tu es prêt(e) !<br>
+    🎭 Rôle : <em>${r || '…'}</em><br>
+    🏆 Ta fierté : <em>${f || '…'}</em><br>
+    💪 Ta force : <em>${fo || '…'}</em><br><br>
+    <span style="font-size:1.1rem">🎤 À toi de jouer !</span>`;
+  res.style.display = 'block';
+  res.classList.add('bounce');
+}
+</script>
+</body>
+</html>
